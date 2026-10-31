@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diagrama de estados dinámico – U.E. Uyumbicho</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f7f8fa;--card:#fff;--tx:#1d2330;--mu:#5b6475;--bd:#d9dde5;--ac:#2f5bd8;--ok:#1f8a4c;--okb:#e0f3e8;--ko:#c23b3b;--kob:#fbe4e4;--nb:#e8eefc;--wa:#b26a00;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14171d;--card:#1c2029;--tx:#e8eaf0;--mu:#9aa3b5;--bd:#333a48;--ac:#7fa0ff;--ok:#5fd18d;--okb:#17352473;--ko:#ff8080;--kob:#4a1f1f73;--nb:#222d4d;--wa:#ffb454;}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.6rem;margin:.2em 0}h2{font-size:1.2rem;margin:0 0 10px}
+.sub{color:var(--mu);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:18px}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{border:1px solid var(--bd);padding:6px 9px;text-align:center}
+th{background:var(--nb)}td.z{color:var(--mu)}td.h{font-weight:600}
+input,select,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 10px}
+td input{width:84px;text-align:center}
+input:disabled{opacity:.7}
+button{cursor:pointer;background:var(--nb)}button:hover{border-color:var(--ac)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.bar label{color:var(--mu);font-size:.9rem}
+.bad{color:var(--wa);font-weight:600}.good{color:var(--ok)}
+.leg{display:flex;gap:16px;flex-wrap:wrap;font-size:.88rem;color:var(--mu);margin-top:8px}
+.leg i{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:5px;border:2px solid}
+.pr{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:8px}
+.pr div{border:1px solid var(--bd);border-radius:10px;padding:8px;text-align:center;background:var(--nb)}
+.pr b{display:block;font-size:1.2rem;color:var(--ok)}
+svg{min-width:1000px;display:block;width:100%;height:auto}
+svg text{fill:var(--tx);font-family:inherit}
+.n{fill:var(--nb);stroke:var(--ac);stroke-width:2.5}
+.ab1{fill:var(--okb);stroke:var(--ok);stroke-width:2.5}
+.ab2{fill:var(--kob);stroke:var(--ko);stroke-width:2.5}
+.e{fill:none;stroke:var(--ac);stroke-width:2}.er{stroke:var(--mu)}.ea{stroke:var(--ko)}
+.z0{stroke-dasharray:5 5;opacity:.45}.lb{font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<h1>Diagrama de estados dinámico: seguimiento de promociones</h1>
+<p class="sub">Unidad Educativa Uyumbicho · Pensamiento Algebraico · Maestría en Educación, Mención Enseñanza de la Matemática</p>
+
+<section class="card">
+<h2>1. Datos de la promoción</h2>
+<div class="bar">
+<label for="sel">Promoción:</label><select id="sel"></select>
+<span id="ed" class="bar" style="margin:0">
+<label for="nm">Nombre</label><input id="nm" size="22">
+<label for="st">Año de inicio (8.º EGB)</label><input id="st" type="number" min="1990" max="2100" style="width:90px">
+</span>
+<button id="add">+ Nueva promoción</button><button id="del">Eliminar</button>
+</div>
+<div class="sc"><table id="t1"></table></div>
+<p class="sub" style="margin:8px 0 0">Escribe los datos en la tabla y todo se actualiza solo. La opción “Todas (acumulado)” suma las promociones por año de estudio y es solo de lectura. Los datos se guardan en este navegador.</p>
+</section>
+
+<section class="card">
+<h2>2. Diagrama de estados</h2>
+<div class="sc"><svg id="g" viewBox="0 0 1240 520" role="img" aria-label="Diagrama de estados de la trayectoria de 8.º EGB a 3.º BGU"></svg></div>
+<div class="leg">
+<span><i style="border-color:var(--ac);background:var(--nb)"></i>Estado transitorio</span>
+<span><i style="border-color:var(--ok);background:var(--okb)"></i>Absorbente: Culminado</span>
+<span><i style="border-color:var(--ko);background:var(--kob)"></i>Absorbente: Abandonado</span>
+<span>Línea punteada: transición válida con probabilidad 0</span>
+</div>
+</section>
+
+<section class="card">
+<h2>3. Matriz de transición P</h2>
+<div class="sc"><table id="t2"></table></div>
+<p class="sub" style="margin:8px 0 0">P(i,j) = estudiantes que pasan de i a j ÷ matriculados en i. Cada fila suma 1; Culminado y Abandonado son absorbentes (P<sub>ii</sub> = 1).</p>
+</section>
+
+<section class="card">
+<h2>4. Lectura del modelo</h2>
+<ul id="lec"></ul>
+<p class="sub" style="margin:10px 0 0">Probabilidad de culminar el bachillerato partiendo de cada estado (considerando que se puede repetir):</p>
+<div class="pr" id="pr"></div>
+</section>
+</main>
+
+<script>
+const G=["8.º EGB","9.º EGB","10.º EGB","1.º BGU","2.º BGU","3.º BGU"];
+const names=G.concat(["Culminado","Abandonado"]);
+const KEY="uyumbicho_promos_v1";
+const blank=()=>G.map(()=>[0,0,0,0]);
+let S={sel:0,promos:[{name:"Promoción 2019-2025",start:2019,rows:[[148,148,0,0],[155,155,0,0],[153,150,3,0],[172,155,13,4],[175,175,0,0],[180,177,3,0]]}]};
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.promos&&o.promos.length)S=o}}catch(e){}
+const $=id=>document.getElementById(id);
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const pc=v=>(v*100).toLocaleString("es-EC",{maximumFractionDigits:1})+" %";
+const isAll=()=>S.sel==="all";
+function rows(){
+  if(!isAll())return S.promos[S.sel].rows;
+  return G.map((_,i)=>[0,1,2,3].map(k=>S.promos.reduce((a,p)=>a+(+p.rows[i][k]||0),0)));
+}
+function fillSel(){
+  $("sel").innerHTML=S.promos.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("")+(S.promos.length>1?'<option value="all">Todas (acumulado)</option>':"");
+  $("sel").value=S.sel;
+}
+function buildTable(){
+  const p=isAll()?null:S.promos[S.sel];
+  $("ed").style.display=p?"flex":"none";$("del").style.display=p&&S.promos.length>1?"":"none";
+  if(p){$("nm").value=p.name;$("st").value=p.start}
+  let h="<tr><th>Año</th><th>Período</th><th>Matriculados</th><th>Promovidos</th><th>No promovidos</th><th>Abandono</th><th>Control</th></tr>";
+  const R=rows();
+  G.forEach((g,i)=>{
+    h+=`<tr><td class="h">${g}</td><td id="pe${i}">${p?(p.start+i)+"-"+(p.start+i+1):"—"}</td>`+
+    [0,1,2,3].map(k=>`<td><input type="number" min="0" step="1" data-i="${i}" data-k="${k}" value="${R[i][k]}" ${p?"":"disabled"}></td>`).join("")+`<td id="ck${i}"></td></tr>`;
+  });
+  $("t1").innerHTML=h;
+}
+function probs(R){return R.map(r=>r[0]>0?[r[1]/r[0],r[2]/r[0],r[3]/r[0]]:[0,0,0])}
+function update(){
+  const R=rows(),P=probs(R),p=isAll()?null:S.promos[S.sel];
+  G.forEach((_,i)=>{
+    $("ck"+i).innerHTML=R[i][0]===0?'<span class="bad">sin datos</span>':(R[i][0]===R[i][1]+R[i][2]+R[i][3]?'<span class="good">✓</span>':`<span class="bad">⚠ difiere en ${R[i][0]-R[i][1]-R[i][2]-R[i][3]}</span>`);
+    if(p)$("pe"+i).textContent=(p.start+i)+"-"+(p.start+i+1);
+  });
+  // matriz
+  const M=names.map(()=>names.map(()=>0));
+  P.forEach((q,i)=>{M[i][i+1]=q[0];M[i][i]=q[1];M[i][7]=q[2]});M[6][6]=1;M[7][7]=1;
+  let m="<tr><th>De \\ A</th>"+names.map(n=>`<th>${n}</th>`).join("")+"</tr>";
+  M.forEach((r,i)=>{m+=`<tr><th>${names[i]}</th>`+r.map(v=>`<td class="${v?'':'z'}">${v.toFixed(3)}</td>`).join("")+"</tr>"});
+  $("t2").innerHTML=m;
+  draw(R,P);
+  // probabilidad de culminar
+  const f=Array(7).fill(0);f[6]=1;
+  for(let i=5;i>=0;i--){const rp=P[i][1];f[i]=R[i][0]>0&&rp<1?P[i][0]*f[i+1]/(1-rp):0}
+  $("pr").innerHTML=G.map((g,i)=>`<div>${g}<b>${R[i][0]>0?pc(f[i]):"—"}</b></div>`).join("");
+  // lectura
+  let best=-1,bv=-1;P.forEach((q,i)=>{if(R[i][0]>0&&q[1]+q[2]>bv){bv=q[1]+q[2];best=i}});
+  const tot=R[0][0],last=R[5];
+  let L=`<li><b>Estados transitorios (6):</b> ${G.join(", ")}. <b>Absorbentes (2):</b> Culminado y Abandonado.</li>`;
+  L+=best>=0&&bv>0?`<li><b>Punto crítico:</b> ${G[best]} tiene la mayor pérdida de continuidad: repetición ${pc(P[best][1])} y abandono ${pc(P[best][2])}.</li>`:`<li><b>Punto crítico:</b> no hay repetición ni abandono en los datos ingresados.</li>`;
+  if(last[0]>0)L+=`<li><b>Culminación:</b> desde 3.º BGU, ${pc(P[5][0])} de los estudiantes culmina la etapa.</li>`;
+  const ab=R.reduce((a,r)=>a+r[3],0),rep=R.reduce((a,r)=>a+r[2],0);
+  L+=`<li><b>Totales de la trayectoria:</b> ${ab} abandonos y ${rep} repeticiones registrados${tot?`, con ${tot} estudiantes en 8.º EGB`:""}.</li>`;
+  $("lec").innerHTML=L;
+}
+function draw(R,P){
+  const X=i=>90+i*170,Y=200,Rd=46,AX=600,AY=450,cx=1150;
+  let s=`<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs><style>.m1{color:var(--ac)}.m2{color:var(--mu)}.m3{color:var(--ko)}</style>`;
+  P.forEach((q,i)=>{
+    const x=X(i),nx=i<5?X(i+1):cx,z=v=>v?"":" z0";
+    s+=`<g class="m1"><line class="e${z(q[0])}" x1="${x+Rd}" y1="${Y}" x2="${nx-Rd-(i==5?4:0)}" y2="${Y}" marker-end="url(#a)"/></g><text class="lb" x="${(x+nx)/2}" y="${Y-10}" text-anchor="middle">${pc(q[0])}</text>`;
+    s+=`<g class="m2"><path class="e er${z(q[1])}" d="M${x-22} ${Y-Rd+4} C${x-60} ${Y-125} ${x+60} ${Y-125} ${x+22} ${Y-Rd+4}" marker-end="url(#a)"/></g><text class="lb" x="${x}" y="${Y-112}" text-anchor="middle">${pc(q[1])}</text>`;
+    const sy=Y+Rd,tx=AX-(AX-x)*0.12,ty=AY-Rd+4;
+    s+=`<g class="m3"><line class="e ea${z(q[2])}" x1="${x}" y1="${sy}" x2="${tx}" y2="${ty}" marker-end="url(#a)"/></g><text class="lb" x="${x+(tx-x)*0.3}" y="${sy+(ty-sy)*0.3-4}" text-anchor="${i<3?'end':'start'}" dx="${i<3?-4:4}">${pc(q[2])}</text>`;
+  });
+  G.forEach((g,i)=>{s+=`<circle class="n" cx="${X(i)}" cy="${Y}" r="${Rd}"/><text x="${X(i)}" y="${Y+5}" text-anchor="middle" font-size="15" font-weight="700">${g}</text>`});
+  s+=`<circle class="ab1" cx="${cx}" cy="${Y}" r="${Rd}"/><circle class="ab1" cx="${cx}" cy="${Y}" r="${Rd-7}" style="stroke-width:1.5"/><text x="${cx}" y="${Y+4}" text-anchor="middle" font-size="12.5" font-weight="700">Culminado</text>`;
+  s+=`<circle class="ab2" cx="${AX}" cy="${AY}" r="${Rd}"/><circle class="ab2" cx="${AX}" cy="${AY}" r="${Rd-7}" style="stroke-width:1.5"/><text x="${AX}" y="${AY+4}" text-anchor="middle" font-size="12" font-weight="700">Abandonado</text>`;
+  s+=`<text x="${cx}" y="${Y+72}" text-anchor="middle" font-size="12" style="fill:var(--ok)">absorbente · 100 % se queda</text><text x="${AX}" y="${AY+72}" text-anchor="middle" font-size="12" style="fill:var(--ko)">absorbente · 100 % se queda</text>`;
+  $("g").innerHTML=s;
+}
+$("t1").addEventListener("input",e=>{
+  const t=e.target;if(t.dataset.i===undefined||isAll())return;
+  S.promos[S.sel].rows[+t.dataset.i][+t.dataset.k]=Math.max(0,parseInt(t.value)||0);save();update();
+});
+$("nm").addEventListener("input",e=>{S.promos[S.sel].name=e.target.value||"Sin nombre";save();const o=$("sel").options[S.sel];if(o)o.textContent=S.promos[S.sel].name});
+$("st").addEventListener("input",e=>{const v=parseInt(e.target.value);if(v>1900){S.promos[S.sel].start=v;save();update()}});
+$("sel").addEventListener("change",e=>{S.sel=e.target.value==="all"?"all":+e.target.value;save();buildTable();update()});
+$("add").addEventListener("click",()=>{
+  const st=Math.max(...S.promos.map(p=>+p.start||2019))+1;
+  S.promos.push({name:`Promoción ${st}-${st+6}`,start:st,rows:blank()});S.sel=S.promos.length-1;save();fillSel();buildTable();update();
+});
+$("del").addEventListener("click",()=>{
+  if(isAll()||S.promos.length<2||!confirm("¿Eliminar esta promoción?"))return;
+  S.promos.splice(S.sel,1);S.sel=0;save();fillSel();buildTable();update();
+});
+if(S.sel!=="all"&&!S.promos[S.sel])S.sel=0;
+fillSel();buildTable();update();
+</script>
+</body>
+</html>
